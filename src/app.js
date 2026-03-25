@@ -49,10 +49,12 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 async function start() {
-  const dbConnected = await testConnection();
-  if (!dbConnected) {
-    logger.error('Cannot start without database connection');
-    process.exit(1);
+  if (process.env.SKIP_DB_CHECK !== 'true') {
+    const dbConnected = await testConnection();
+    if (!dbConnected) {
+      logger.error('Cannot start without database connection');
+      process.exit(1);
+    }
   }
 
   const server = app.listen(config.port, () => {

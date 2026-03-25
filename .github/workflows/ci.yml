@@ -83,16 +83,17 @@ jobs:
           docker run --rm -d --name api-smoke \
             -e NODE_ENV=production \
             -e PORT=3000 \
+            -e SKIP_DB_CHECK=true \
+            -p 3000:3000 \
             payment-webhook-service:${{ github.sha }}
           sleep 5
           docker logs api-smoke
+          curl -sf http://localhost:3000/health || (docker logs api-smoke && exit 1)
           docker stop api-smoke || true
 
       - name: Verify Worker image runs
         run: |
-          docker run --rm -d --name worker-smoke \
+          docker run --rm \
             -e NODE_ENV=production \
-            payment-webhook-worker:${{ github.sha }}
-          sleep 5
-          docker logs worker-smoke
-          docker stop worker-smoke || true
+            payment-webhook-worker:${{ github.sha }} \
+            node -e "require('./src/config'); console.log('Worker image OK')"

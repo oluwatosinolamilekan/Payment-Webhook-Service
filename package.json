@@ -1,0 +1,58 @@
+{
+  "name": "payment-webhook-service",
+  "version": "1.0.0",
+  "description": "Production-grade payment webhook processing service for fintech platforms",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest --coverage --forceExit",
+    "test:unit": "jest tests/unit --coverage --forceExit",
+    "test:integration": "jest tests/integration --forceExit",
+    "test:watch": "jest --watch",
+    "migrate": "node migrations/run.js",
+    "migrate:rollback": "node migrations/rollback.js",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
+    "queue:worker": "node src/queues/worker.js",
+    "healthcheck": "node src/monitoring/healthCheck.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "knex": "^3.1.0",
+    "pg": "^8.13.0",
+    "bullmq": "^5.12.0",
+    "ioredis": "^5.4.1",
+    "winston": "^3.14.0",
+    "prom-client": "^15.1.0",
+    "helmet": "^7.1.0",
+    "cors": "^2.8.5",
+    "express-rate-limit": "^7.4.0",
+    "joi": "^17.13.0",
+    "uuid": "^10.0.0",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.4.5",
+    "axios": "^1.7.7",
+    "http-graceful-shutdown": "^3.1.13"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "nodemon": "^3.1.4",
+    "eslint": "^8.57.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/app.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

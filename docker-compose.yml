@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # ---- Application ----
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: pay4x-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - pay4x-network
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'
+
+  # ---- Queue Worker ----
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: pay4x-worker
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres
+      - REDIS_HOST=redis
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - pay4x-network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+
+  # ---- PostgreSQL ----
+  postgres:
+    image: postgres:16-alpine
+    container_name: pay4x-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: payment_webhooks
+      POSTGRES_USER: pay4x
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_dev_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pay4x -d payment_webhooks"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pay4x-network
+
+  # ---- Redis ----
+  redis:
+    image: redis:7-alpine
+    container_name: pay4x-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pay4x-network
+
+  # ---- Monitoring: Prometheus ----
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pay4x-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - pay4x-network
+
+  # ---- Monitoring: Grafana ----
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pay4x-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - pay4x-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  pay4x-network:
+    driver: bridge

@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'pay4x-api'
+    metrics_path: '/health/metrics'
+    static_configs:
+      - targets: ['api:3000']
+        labels:
+          service: 'payment-webhook-api'

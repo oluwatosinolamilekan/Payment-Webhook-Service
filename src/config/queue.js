@@ -1,4 +1,4 @@
-const { Queue, Worker, QueueScheduler } = require('bullmq');
+const { Queue, Worker } = require('bullmq');
 const IORedis = require('ioredis');
 const config = require('./index');
 const logger = require('./logger');

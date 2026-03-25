@@ -1,6 +1,5 @@
 const { authenticateApiKey } = require('../../../src/api/middleware/auth');
 const Merchant = require('../../../src/models/Merchant');
-const { hashApiKey } = require('../../../src/utils/crypto');
 
 jest.mock('../../../src/models/Merchant');
 jest.mock('../../../src/config/logger', () => ({

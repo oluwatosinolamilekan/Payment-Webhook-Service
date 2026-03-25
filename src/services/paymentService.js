@@ -1,10 +1,9 @@
 const { v4: uuidv4 } = require('uuid');
 const { db } = require('../config/database');
 const Transaction = require('../models/Transaction');
-const IdempotencyKey = require('../models/IdempotencyKey');
 const FraudDetectionService = require('./fraudDetectionService');
 const { getGateway } = require('../integrations/GatewayFactory');
-const { ConflictError, ValidationError, GatewayError } = require('../utils/errors');
+const {  ValidationError } = require('../utils/errors');
 const logger = require('../config/logger');
 const { metrics } = require('../monitoring/metrics');
 

@@ -1,7 +1,6 @@
 const { Router } = require('express');
 const { db } = require('../../config/database');
 const { redisConnection } = require('../../config/queue');
-const { metrics } = require('../../monitoring/metrics');
 
 const router = Router();
 

@@ -1,7 +1,6 @@
 const Merchant = require('../../models/Merchant');
 const { hashApiKey } = require('../../utils/crypto');
 const { AuthenticationError, ForbiddenError } = require('../../utils/errors');
-const logger = require('../../config/logger');
 
 async function authenticateApiKey(req, res, next) {
   try {

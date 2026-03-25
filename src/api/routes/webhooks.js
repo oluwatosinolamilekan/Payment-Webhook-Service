@@ -4,7 +4,6 @@ const { webhookLimiter } = require('../middleware/rateLimiter');
 const { authenticateApiKey } = require('../middleware/auth');
 const { validateQuery, paginationSchema } = require('../validators/webhookValidator');
 const { getSupportedGateways } = require('../../integrations/GatewayFactory');
-const logger = require('../../config/logger');
 
 const router = Router();
 
